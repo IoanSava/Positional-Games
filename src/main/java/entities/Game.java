@@ -16,6 +16,7 @@ import java.util.*;
  *
  * @author Ioan Sava
  * @see <a href="https://en.wikipedia.org/wiki/Positional_game">https://en.wikipedia.org/wiki/Positional_game</a>
+ * @see <a href="https://en.wikipedia.org/wiki/Arithmetic_progression_game">https://en.wikipedia.org/wiki/Arithmetic_progression_game</a>
  */
 @NoArgsConstructor
 @Getter
@@ -124,6 +125,7 @@ public class Game {
     }
 
     private void playerTurnMessage(int turn) {
+        System.out.println("---------------------------------------------------------------");
         System.out.println(listOfPlayers.get(turn).getName() + "'s turn");
         System.out.println("Current board: " + getBoard());
         if (getPlayersTokens().size() > turn) {
@@ -213,12 +215,14 @@ public class Game {
      */
     public boolean gameHasEnded() {
         if (board.getTokens().size() == 0 || !timeKeeper.isAlive()) {
+            System.out.println("---------------------------------------------------------------");
             System.out.println("Game over");
             showRanking();
             return true;
         } else {
             int playerScore = computePlayerScore(getCurrentTurn());
             if (playerScore >= sizeOfArithmeticProgression) {
+                System.out.println("---------------------------------------------------------------");
                 System.out.println(listOfPlayers.get(getCurrentTurn()).getName() + " won");
                 System.out.println("Game has ended");
                 return true;

@@ -33,6 +33,17 @@ public class Application {
     }
 
     /**
+     * Generate a random permutation of
+     * the elements in the range [lowerBound, upperBound]
+     */
+    private static List<Integer> generateRandomPermutation(int lowerBound, int upperBound) {
+        List<Integer> permutation = IntStream.rangeClosed(lowerBound, upperBound)
+                .boxed().collect(Collectors.toList());
+        Collections.shuffle(permutation);
+        return permutation
+    }
+
+    /**
      * Generate a given number of tokens.
      * A token cannot have a value greater than
      * 'maximumValueOfToken'
@@ -40,13 +51,10 @@ public class Application {
     public static Set<Token> generateTokens(int numberOfTokens, int maximumValueOfToken)
             throws InvalidTokenValueException {
         Set<Token> tokens = new TreeSet<>();
-
-        List<Integer> listOfValues = IntStream.rangeClosed(0, maximumValueOfToken)
-                .boxed().collect(Collectors.toList());
-        Collections.shuffle(listOfValues);
+        List<Integer> permutation = generateRandomPermutation(0, maximumValueOfToken);
 
         for (int i = 0; i < numberOfTokens; ++i) {
-            tokens.add(new Token(listOfValues.get(i)));
+            tokens.add(new Token(permutation.get(i)));
         }
 
         return tokens;
