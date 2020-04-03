@@ -24,6 +24,7 @@ import java.util.Set;
  *
  * @author Ioan Sava
  * @see <a href="https://en.wikipedia.org/wiki/Clique_game">https://en.wikipedia.org/wiki/Clique_game</a>
+ * @see <a href="https://en.wikipedia.org/wiki/Clique_(graph_theory)">https://en.wikipedia.org/wiki/Clique_(graph_theory)</a>
  */
 public class CliqueGame extends Game {
     /**
@@ -68,7 +69,8 @@ public class CliqueGame extends Game {
     }
 
     /**
-     *
+     * Include the last token picked by the player
+     * to his graph.
      */
     private void updatePlayerGraph(int index) {
         while (graphs.size() <= index) {
