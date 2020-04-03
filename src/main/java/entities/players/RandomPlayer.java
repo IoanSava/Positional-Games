@@ -1,6 +1,6 @@
 package entities.players;
 
-import entities.Token;
+import entities.tokens.Token;
 
 import java.util.Iterator;
 import java.util.Random;

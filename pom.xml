@@ -20,6 +20,12 @@
             <version>1.18.10</version>
             <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <groupId>jgrapht</groupId>
+            <artifactId>jgrapht</artifactId>
+            <version>0.7.3</version>
+        </dependency>
     </dependencies>
 
 </project>

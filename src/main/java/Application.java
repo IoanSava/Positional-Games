@@ -1,35 +1,57 @@
 import entities.Board;
-import entities.Game;
+import entities.games.ArithmeticProgressionGame;
+import entities.games.CliqueGame;
+import entities.games.Game;
 import entities.players.ManualPlayer;
-import entities.Token;
+import entities.tokens.ArithmeticProgressionToken;
 import entities.players.Player;
 import entities.players.RandomPlayer;
-import exceptions.InvalidDurationOfGameException;
-import exceptions.InvalidSizeOfArithmeticProgressionException;
-import exceptions.InvalidTimeException;
-import exceptions.InvalidTokenValueException;
+import entities.tokens.Token;
+import entities.tokens.clique_token.CliqueGameToken;
+import exceptions.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+
+/**
+ * @author Ioan Sava
+ */
 public class Application {
     private static final int NUMBER_OF_TOKENS = 10;
     private static final int MAXIMUM_VALUE_OF_TOKEN = 15;
     private static final int NUMBER_OF_PLAYERS = 3;
     private static final int SIZE_OF_ARITHMETIC_PROGRESSION = 4;
     private static final int DURATION_OF_GAME = 1;
+    private static final int NUMBER_OF_NODES = 8;
+    private static final int SIZE_OF_CLIQUE = 3;
 
     public static void main(String[] args) {
-        try {
-            Set<Token> tokens = generateTokens(NUMBER_OF_TOKENS, MAXIMUM_VALUE_OF_TOKEN);
-            Board board = new Board(tokens);
-            Game game = new Game(board, SIZE_OF_ARITHMETIC_PROGRESSION, DURATION_OF_GAME);
-            addMockPlayersToGame(game);
-            game.start();
-        } catch (InvalidDurationOfGameException | InvalidSizeOfArithmeticProgressionException | InvalidTokenValueException | InvalidTimeException exception) {
-            System.out.println(exception.getMessage());
+        int typeOfGame = chooseGame();
+        if (typeOfGame == 1) {
+            playArithmeticProgressionGame();
+        } else {
+            playCliqueGame();
         }
+    }
+
+    public static void showGameChooser() {
+        System.out.println("1 - Arithmetic Progression Game");
+        System.out.println("2 - Clique Game");
+        System.out.println("Choose a game");
+    }
+
+    public static int chooseGame() {
+        showGameChooser();
+        Scanner scanner = new Scanner(System.in);
+        int typeOfGame = scanner.nextInt();
+        while (typeOfGame != 1 && typeOfGame != 2) {
+            System.out.println("Invalid game");
+            showGameChooser();
+            typeOfGame = scanner.nextInt();
+        }
+        return typeOfGame;
     }
 
     /**
@@ -40,7 +62,7 @@ public class Application {
         List<Integer> permutation = IntStream.rangeClosed(lowerBound, upperBound)
                 .boxed().collect(Collectors.toList());
         Collections.shuffle(permutation);
-        return permutation
+        return permutation;
     }
 
     /**
@@ -48,13 +70,29 @@ public class Application {
      * A token cannot have a value greater than
      * 'maximumValueOfToken'
      */
-    public static Set<Token> generateTokens(int numberOfTokens, int maximumValueOfToken)
+    public static Set<Token> generateAPTokens(int numberOfTokens, int maximumValueOfToken)
             throws InvalidTokenValueException {
         Set<Token> tokens = new TreeSet<>();
         List<Integer> permutation = generateRandomPermutation(0, maximumValueOfToken);
 
         for (int i = 0; i < numberOfTokens; ++i) {
-            tokens.add(new Token(permutation.get(i)));
+            tokens.add(new ArithmeticProgressionToken(permutation.get(i)));
+        }
+
+        return tokens;
+    }
+
+    /**
+     * It generates tokens with all
+     * the possibilities of edges between 'numberOfNodes' nodes
+     */
+    public static Set<Token> generateCGTokens(int numberOfNodes) {
+        Set<Token> tokens = new TreeSet<>();
+        for (int i = 1; i < numberOfNodes; ++i) {
+            for (int j = i + 1; j <= numberOfNodes; ++j) {
+
+                tokens.add(new CliqueGameToken(i, j));
+            }
         }
 
         return tokens;
@@ -79,5 +117,30 @@ public class Application {
         Player manualPlayer = new ManualPlayer("john");
         Player randomPlayer = new RandomPlayer("ioan");
         game.addPlayers(manualPlayer, randomPlayer);
+    }
+
+    public static void playArithmeticProgressionGame() {
+        try {
+            Set<Token> tokens = generateAPTokens(NUMBER_OF_TOKENS, MAXIMUM_VALUE_OF_TOKEN);
+            Board board = new Board(tokens);
+            Game game = new ArithmeticProgressionGame(board, DURATION_OF_GAME, SIZE_OF_ARITHMETIC_PROGRESSION);
+            addMockPlayersToGame(game);
+            game.start();
+        } catch (InvalidDurationOfGameException | InvalidTimeException | InvalidTokenValueException |
+                InvalidSizeOfArithmeticProgressionException exception) {
+            System.out.println(exception.getMessage());
+        }
+    }
+
+    public static void playCliqueGame() {
+        try {
+            Set<Token> tokens = generateCGTokens(NUMBER_OF_NODES);
+            Board board = new Board(tokens);
+            Game game = new CliqueGame(board, DURATION_OF_GAME, SIZE_OF_CLIQUE);
+            addMockPlayersToGame(game);
+            game.start();
+        } catch (InvalidDurationOfGameException | InvalidCliqueSizeException | InvalidTimeException exception) {
+            System.out.println(exception.getMessage());
+        }
     }
 }

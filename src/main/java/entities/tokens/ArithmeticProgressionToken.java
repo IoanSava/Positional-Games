@@ -1,9 +1,7 @@
-package entities;
+package entities.tokens;
 
 import exceptions.InvalidTokenValueException;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.ToString;
 
 /**
  * An instance of this class will hold a number
@@ -14,12 +12,10 @@ import lombok.ToString;
  * @author Ioan Sava
  */
 @Getter
-@EqualsAndHashCode
-@ToString
-public class Token implements Comparable<Token> {
+public class ArithmeticProgressionToken extends Token {
     private int value;
 
-    public Token(int value) throws InvalidTokenValueException {
+    public ArithmeticProgressionToken(int value) throws InvalidTokenValueException {
         setValue(value);
     }
 
@@ -30,8 +26,17 @@ public class Token implements Comparable<Token> {
         this.value = value;
     }
 
+    public int compareTo(ArithmeticProgressionToken token) {
+        return this.value - token.getValue();
+    }
+
     @Override
     public int compareTo(Token token) {
-        return this.value - token.value;
+        return compareTo((ArithmeticProgressionToken) token);
+    }
+
+    @Override
+    public String toString() {
+        return "APToken(" + value + ')';
     }
 }

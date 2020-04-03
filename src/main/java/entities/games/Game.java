@@ -1,65 +1,55 @@
-package entities;
+package entities.games;
 
+import entities.Board;
+import entities.TimeKeeper;
 import entities.players.Player;
+import entities.tokens.Token;
 import exceptions.InvalidDurationOfGameException;
-import exceptions.InvalidSizeOfArithmeticProgressionException;
 import exceptions.InvalidTimeException;
 import exceptions.PlayerNotFoundException;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.util.*;
 
 /**
- * Arithmetic progression game
- * (positional game)
+ * Generic type of positional game
  *
  * @author Ioan Sava
  * @see <a href="https://en.wikipedia.org/wiki/Positional_game">https://en.wikipedia.org/wiki/Positional_game</a>
- * @see <a href="https://en.wikipedia.org/wiki/Arithmetic_progression_game">https://en.wikipedia.org/wiki/Arithmetic_progression_game</a>
  */
-@NoArgsConstructor
 @Getter
-public class Game {
-    private Board board;
+public abstract class Game {
+    protected Board board;
 
     /**
      * Duration of the game in minutes.
      */
-    private int durationOfTheGame;
-
-    /**
-     * Each player extracts tokens successively from the board
-     * and must create with them a a complete
-     * arithmetic progression of a given size.
-     */
-    private int sizeOfArithmeticProgression;
+    protected int durationOfTheGame;
 
     /**
      * The order number of the player who will choose a token.
      */
-    private int currentTurn;
+    protected int currentTurn;
 
     /**
      * The list of players who joined the game
      */
-    private List<Player> listOfPlayers = new ArrayList<>();
+    protected List<Player> listOfPlayers = new ArrayList<>();
 
     /**
      * The list of the tokens held by each player
      */
-    private List<Set<Token>> playersTokens = new ArrayList<>();
+    protected List<Set<Token>> playersTokens = new ArrayList<>();
 
     /**
      * This daemon thread will display the running time
      * of the game and it will stop the game if it exceeds a certain time limit
      */
-    TimeKeeper timeKeeper;
+    protected TimeKeeper timeKeeper;
 
-    public Game(Board board, int sizeOfArithmeticProgression, int durationOfTheGame) throws
-            InvalidSizeOfArithmeticProgressionException, InvalidDurationOfGameException, InvalidTimeException {
+    public Game(Board board, int durationOfTheGame) throws
+            InvalidDurationOfGameException, InvalidTimeException {
         this.board = board;
-        setSizeOfArithmeticProgression(sizeOfArithmeticProgression);
         setDurationOfTheGame(durationOfTheGame);
         timeKeeper = new TimeKeeper(durationOfTheGame);
         timeKeeper.setDaemon(true);
@@ -67,14 +57,6 @@ public class Game {
 
     private void setCurrentTurn(int currentTurn) {
         this.currentTurn = currentTurn;
-    }
-
-    private void setSizeOfArithmeticProgression(int sizeOfArithmeticProgression) throws
-            InvalidSizeOfArithmeticProgressionException {
-        if (sizeOfArithmeticProgression < 1) {
-            throw new InvalidSizeOfArithmeticProgressionException("The size of an arithmetic progression should be at least 1");
-        }
-        this.sizeOfArithmeticProgression = sizeOfArithmeticProgression;
     }
 
     private void setDurationOfTheGame(int durationOfTheGame) throws InvalidDurationOfGameException {
@@ -109,11 +91,7 @@ public class Game {
         playersTokens.get(indexOfPlayer).add(token);
     }
 
-    private void welcomeMessage() {
-        System.out.println("Welcome to Arithmetic progression game");
-        System.out.println("Your goal is to be the first to achieve" +
-                " an arithmetic progression of length " + sizeOfArithmeticProgression);
-    }
+    abstract protected void welcomeMessage();
 
     /**
      * Each player has his own thread
@@ -127,77 +105,18 @@ public class Game {
     private void playerTurnMessage(int turn) {
         System.out.println("---------------------------------------------------------------");
         System.out.println(listOfPlayers.get(turn).getName() + "'s turn");
-        System.out.println("Current board: " + getBoard());
+        System.out.println(getBoard());
         if (getPlayersTokens().size() > turn) {
             System.out.println("Your tokens: " + getPlayersTokens().get(turn));
         }
     }
 
-    /**
-     * Return the longest arithmetic progression size for
-     * a given list of integers using a Dynamic Programming approach.
-     */
-    private int longestArithmeticProgression(List<Integer> numbers) {
-        if (numbers == null) {
-            return 0;
-        } else if (numbers.size() < 3) {
-            return numbers.size();
-        }
-
-        Map<Integer, Integer>[] matrix = new HashMap[numbers.size()];
-        int result = 2;
-        for (int i = 0; i < numbers.size(); ++i) {
-            matrix[i] = new HashMap<>();
-            for (int j = 0; j < i; ++j) {
-                int difference = numbers.get(i) - numbers.get(j);
-                matrix[i].put(difference, matrix[j].getOrDefault(difference, 1) + 1);
-                result = Math.max(result, matrix[i].get(difference));
-            }
-        }
-
-        return result;
-    }
-
-    /**
-     * Check if a list of tokens contains a blank token
-     * (a wildcard).
-     */
-    private boolean containsBlankToken(Set<Token> tokens) {
-        for (Token token : tokens) {
-            if (token.getValue() == 0) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private List<Integer> convertSetOfTokensToArray(Set<Token> tokens) {
-        List<Integer> numbers = new ArrayList<>();
-        for (Token token : tokens) {
-            if (token.getValue() != 0) {
-                numbers.add(token.getValue());
-            }
-        }
-        return numbers;
-    }
-
-    /**
-     * A player receives a number of points equal
-     * to the their largest arithmetic progression.
-     */
-    private int computePlayerScore(int index) {
-        int bonus = 0;
-        if (containsBlankToken(playersTokens.get(index))) {
-            bonus = 1;
-        }
-
-        return bonus + longestArithmeticProgression(convertSetOfTokensToArray(playersTokens.get(index)));
-    }
+    abstract protected int computePlayerScore(int index);
 
     /**
      * Shows the score of each player.
      */
-    private void showRanking() {
+    protected void showRanking() {
         System.out.println("Scores: ");
         for (int i = 0; i < listOfPlayers.size(); ++i) {
             int playerScore = computePlayerScore(i);
@@ -206,14 +125,19 @@ public class Game {
     }
 
     /**
-     * The game ends when either a player makes a complete
-     * arithmetic progression or when all tokens have been removed from the board.
+     * Objective of the game
+     */
+    protected abstract int getObjective();
+
+    /**
+     * The game ends when either a player achieves the game objective
+     * or when all tokens have been removed from the board.
      * Also, the game ends if it exceeds a certain time limit.
      *
      * @return true if the game is over
      * false, otherwise
      */
-    public boolean gameHasEnded() {
+    protected boolean gameOver() {
         if (board.getTokens().size() == 0 || !timeKeeper.isAlive()) {
             System.out.println("---------------------------------------------------------------");
             System.out.println("Game over");
@@ -221,7 +145,7 @@ public class Game {
             return true;
         } else {
             int playerScore = computePlayerScore(getCurrentTurn());
-            if (playerScore >= sizeOfArithmeticProgression) {
+            if (playerScore >= getObjective()) {
                 System.out.println("---------------------------------------------------------------");
                 System.out.println(listOfPlayers.get(getCurrentTurn()).getName() + " won");
                 System.out.println("Game has ended");
@@ -237,7 +161,7 @@ public class Game {
      * Otherwise, no player can make any move.
      */
     public void update() {
-        if (gameHasEnded()) {
+        if (gameOver()) {
             setCurrentTurn(-1);
         } else {
             int nextTurn = (getCurrentTurn() + 1) % getListOfPlayers().size();

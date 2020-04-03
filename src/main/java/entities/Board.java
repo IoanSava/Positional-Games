@@ -1,27 +1,22 @@
 package entities;
 
+import entities.tokens.Token;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import java.util.*;
 
 /**
  * At the beginning of the game
  * the board contains a given number
- * of tokens, each token having a
- * distinct value from 1 to m.
- * Also, a token may be blank,
- * meaning that it can take
- * the place of any value.
+ * of tokens.
  *
  * @author Ioan Sava
  */
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@ToString
 public class Board {
     private Set<Token> tokens = new HashSet<>();
 
@@ -31,5 +26,26 @@ public class Board {
 
     public void removeToken(Token token) {
         this.tokens.remove(token);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("**************\n");
+        stringBuilder.append("Board:\n");
+        int counter = 0;
+        for (Token token : tokens) {
+            stringBuilder.append(counter).append(". ").append(token).append("   ");
+            ++counter;
+            if (counter % 4 == 0) {
+                stringBuilder.append("\n");
+            }
+        }
+
+        if (counter % 4 != 0) {
+            stringBuilder.append("\n");
+        }
+        stringBuilder.append("**************\n");
+        return stringBuilder.toString();
     }
 }

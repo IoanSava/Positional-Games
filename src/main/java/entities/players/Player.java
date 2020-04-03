@@ -1,7 +1,7 @@
 package entities.players;
 
-import entities.Game;
-import entities.Token;
+import entities.games.Game;
+import entities.tokens.Token;
 import exceptions.InvalidTokenValueException;
 import lombok.*;
 
@@ -37,12 +37,6 @@ public abstract class Player implements Runnable {
     protected void extractTokenFromBoard() throws InvalidTokenValueException {
         System.out.println("Choose a token ");
         Token token = chooseToken();
-
-        while (!game.getBoard().getTokens().contains(token)) {
-            System.out.println("There is no token with this value on board");
-            System.out.println("Choose a token ");
-            token = chooseToken();
-        }
 
         System.out.println("Player " + getName() + " selected the following token: " + token);
         game.getBoard().removeToken(token);
