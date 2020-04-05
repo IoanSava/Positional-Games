@@ -16,6 +16,8 @@ import java.util.stream.IntStream;
 
 
 /**
+ * Positional games application
+ *
  * @author Ioan Sava
  */
 public class Application {
