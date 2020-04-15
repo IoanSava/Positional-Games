@@ -1,3 +1,5 @@
+package app;
+
 import entities.Board;
 import entities.games.ArithmeticProgressionGame;
 import entities.games.CliqueGame;
@@ -20,31 +22,32 @@ import java.util.stream.IntStream;
  *
  * @author Ioan Sava
  */
-public class Application {
-    private static final int NUMBER_OF_TOKENS = 10;
-    private static final int MAXIMUM_VALUE_OF_TOKEN = 15;
-    private static final int NUMBER_OF_PLAYERS = 3;
-    private static final int SIZE_OF_ARITHMETIC_PROGRESSION = 4;
-    private static final int DURATION_OF_GAME = 1;
-    private static final int NUMBER_OF_NODES = 8;
-    private static final int SIZE_OF_CLIQUE = 3;
+public class GameManager {
+    private final int NUMBER_OF_TOKENS = 10;
+    private final int MAXIMUM_VALUE_OF_TOKEN = 15;
+    private final int NUMBER_OF_PLAYERS = 3;
+    private final int SIZE_OF_ARITHMETIC_PROGRESSION = 4;
+    private final int DURATION_OF_GAME = 1;
+    private final int NUMBER_OF_NODES = 8;
+    private final int SIZE_OF_CLIQUE = 3;
 
     public static void main(String[] args) {
-        int typeOfGame = chooseGame();
+        GameManager gameManager = new GameManager();
+        int typeOfGame = gameManager.chooseGame();
         if (typeOfGame == 1) {
-            playArithmeticProgressionGame();
+            gameManager.playArithmeticProgressionGame();
         } else {
-            playCliqueGame();
+            gameManager.playCliqueGame();
         }
     }
 
-    public static void showGameChooser() {
+    public void showGameChooser() {
         System.out.println("1 - Arithmetic Progression Game");
         System.out.println("2 - Clique Game");
         System.out.println("Choose a game");
     }
 
-    public static int chooseGame() {
+    public int chooseGame() {
         showGameChooser();
         Scanner scanner = new Scanner(System.in);
         int typeOfGame = scanner.nextInt();
@@ -60,7 +63,7 @@ public class Application {
      * Generate a random permutation of
      * the elements in the range [lowerBound, upperBound]
      */
-    private static List<Integer> generateRandomPermutation(int lowerBound, int upperBound) {
+    private List<Integer> generateRandomPermutation(int lowerBound, int upperBound) {
         List<Integer> permutation = IntStream.rangeClosed(lowerBound, upperBound)
                 .boxed().collect(Collectors.toList());
         Collections.shuffle(permutation);
@@ -72,7 +75,7 @@ public class Application {
      * A token cannot have a value greater than
      * 'maximumValueOfToken'
      */
-    public static Set<Token> generateAPTokens(int numberOfTokens, int maximumValueOfToken)
+    public Set<Token> generateAPTokens(int numberOfTokens, int maximumValueOfToken)
             throws InvalidTokenValueException {
         Set<Token> tokens = new TreeSet<>();
         List<Integer> permutation = generateRandomPermutation(0, maximumValueOfToken);
@@ -88,7 +91,7 @@ public class Application {
      * It generates tokens with all
      * the possibilities of edges between 'numberOfNodes' nodes
      */
-    public static Set<Token> generateCGTokens(int numberOfNodes) {
+    public Set<Token> generateCGTokens(int numberOfNodes) {
         Set<Token> tokens = new TreeSet<>();
         for (int i = 1; i < numberOfNodes; ++i) {
             for (int j = i + 1; j <= numberOfNodes; ++j) {
@@ -100,7 +103,7 @@ public class Application {
         return tokens;
     }
 
-    public static void addPlayersToGame(Game game, int numberOfPlayer) {
+    public void addPlayersToGame(Game game, int numberOfPlayer) {
         Scanner scanner = new Scanner(System.in);
 
         for (int i = 1; i <= numberOfPlayer; ++i) {
@@ -115,13 +118,13 @@ public class Application {
         }
     }
 
-    public static void addMockPlayersToGame(Game game) {
+    public void addMockPlayersToGame(Game game) {
         Player manualPlayer = new ManualPlayer("john");
         Player randomPlayer = new RandomPlayer("ioan");
         game.addPlayers(manualPlayer, randomPlayer);
     }
 
-    public static void playArithmeticProgressionGame() {
+    public void playArithmeticProgressionGame() {
         try {
             Set<Token> tokens = generateAPTokens(NUMBER_OF_TOKENS, MAXIMUM_VALUE_OF_TOKEN);
             Board board = new Board(tokens);
@@ -134,7 +137,7 @@ public class Application {
         }
     }
 
-    public static void playCliqueGame() {
+    public void playCliqueGame() {
         try {
             Set<Token> tokens = generateCGTokens(NUMBER_OF_NODES);
             Board board = new Board(tokens);
