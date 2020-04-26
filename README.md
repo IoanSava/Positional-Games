@@ -1,9 +1,5 @@
 # Positional Games
 
- - Compulsory - all bullets
- - Optional - all bullets
- - Bonus - all bullets (Clique Game)
-
 **Manual Player vs Random Player demos:**
 
 ## [Arithmetic Progression Game Demo](https://www.youtube.com/watch?v=6cpjrk6O-2k&feature=youtu.be)
